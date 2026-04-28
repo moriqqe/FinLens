@@ -120,6 +120,3 @@ finlens/
 | Blank page or 502 | Confirm `backend` is running: `docker compose ps` and `docker compose logs nginx backend`. |
 | Cookies / login on `http://localhost` | Set `ENVIRONMENT=development` in `.env` if secure cookies block the session. |
 
-## License
-
-Use and modify according to your project’s license (not specified in this repo).
