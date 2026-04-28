@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinLens — Вхід</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon">₴</div>
+      <div class="logo-text">Fin<span>Lens</span></div>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" data-tab="login">Вхід</div>
+      <div class="auth-tab" id="tabRegister" data-tab="register">Реєстрація</div>
+    </div>
+    <div id="authError" class="auth-error"></div>
+    <div class="auth-panel active" id="panelLogin">
+      <input class="modal-input" type="text" id="loginUser" placeholder="Логін" autocomplete="username">
+      <input class="modal-input" type="password" id="loginPass" placeholder="Пароль" autocomplete="current-password">
+      <div class="modal-actions" style="justify-content:flex-end;margin-top:8px">
+        <button type="button" class="btn-primary" id="btnLogin">Увійти</button>
+      </div>
+    </div>
+    <div class="auth-panel" id="panelRegister">
+      <input class="modal-input" type="text" id="regUser" placeholder="Логін (3–30 символів)" autocomplete="username">
+      <input class="modal-input" type="password" id="regPass" placeholder="Пароль (8+ символів)" autocomplete="new-password">
+      <div class="modal-actions" style="justify-content:flex-end;margin-top:8px">
+        <button type="button" class="btn-primary" id="btnRegister">Зареєструватися</button>
+      </div>
+      <p class="auth-note" id="regClosedNote" style="display:none">Реєстрацію тимчасово закрито адміністратором.</p>
+    </div>
+    <p class="auth-note">Продовжуючи, ви погоджуєтесь з обробкою фінансових виписок на сервері.</p>
+  </div>
+</div>
+<script type="module" src="/static/js/auth.js"></script>
+</body>
+</html>

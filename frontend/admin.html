@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinLens — Адмін</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-header">
+    <h1 class="admin-title">Адмін-панель</h1>
+    <div class="admin-nav">
+      <a class="btn-icon" href="/dashboard" style="text-decoration:none">Кабінет</a>
+      <button type="button" class="btn-icon danger" id="adminLogout">Вийти</button>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <h2>Статистика</h2>
+    <div class="stat-pills" id="statPills"></div>
+  </div>
+
+  <div class="admin-section">
+    <h2>Реєстрація</h2>
+    <div class="toggle-row">
+      <label><input type="checkbox" id="regOpenToggle"> Реєстрація відкрита</label>
+      <button type="button" class="btn-primary" id="saveRegBtn" style="margin-left:12px">Зберегти</button>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <h2>Глобальний OpenAI ключ</h2>
+    <input class="modal-input" type="password" id="globalKeyInput" placeholder="sk-..." autocomplete="off">
+    <div class="modal-actions" style="margin-top:10px">
+      <button type="button" class="btn-ghost" id="delGlobalKeyBtn">Видалити ключ</button>
+      <button type="button" class="btn-primary" id="saveGlobalKeyBtn">Зберегти</button>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <h2>Користувачі</h2>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="usersTable">
+        <thead>
+          <tr>
+            <th>Логін</th>
+            <th>Роль</th>
+            <th>Статус</th>
+            <th>Ключ</th>
+            <th>Створено</th>
+            <th>Останній вхід</th>
+            <th>Дії</th>
+          </tr>
+        </thead>
+        <tbody id="usersBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <h2>Журнал</h2>
+    <div class="admin-controls">
+      <input class="modal-input" type="text" id="logActionFilter" placeholder="action" style="max-width:160px;margin:0">
+      <button type="button" class="btn-primary" id="reloadLogsBtn">Оновити</button>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Час</th>
+            <th>Користувач</th>
+            <th>Дія</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody id="logsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="/static/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinLens — Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="drop-overlay" id="dropOverlay">
+  <div style="font-size:52px">📂</div>
+  <div class="drop-overlay-text">Відпустіть файли</div>
+  <div class="drop-overlay-sub">XLSX · CSV · PDF</div>
+</div>
+
+<div id="loading-overlay">
+  <div class="loader-ring"></div>
+  <div class="loader-steps" id="loaderSteps">
+    <div class="loader-step" id="step1">○ читаємо файли...</div>
+    <div class="loader-step" id="step2">○ парсимо транзакції...</div>
+    <div class="loader-step" id="step3">○ запускаємо AI аналіз...</div>
+    <div class="loader-step" id="step4">○ отримуємо рекомендації...</div>
+    <div class="loader-step" id="step5">○ будуємо дашборд...</div>
+  </div>
+</div>
+
+<div class="modal-bg" id="apiKeyModal">
+  <div class="modal">
+    <div class="modal-title">OpenAI API ключ</div>
+    <div class="modal-sub" id="apiKeyModalSub">Ключ зберігається зашифрованим на сервері. У відповідях відображається лише останні 4 символи.</div>
+    <div id="apiKeyCurrentRow" style="display:none">
+      <div class="api-key-display" id="apiKeyCurrentDisplay"></div>
+    </div>
+    <input class="modal-input" type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" id="apiKeyDeleteBtn" style="display:none">Видалити</button>
+      <button type="button" class="btn-ghost" id="apiKeyCancelBtn">Скасувати</button>
+      <button type="button" class="btn-primary" id="apiKeySaveBtn">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">₴</div>
+      <div class="logo-text">Fin<span>Lens</span></div>
+    </div>
+
+    <div class="sidebar-upload-btn" id="sidebarUploadBtn">
+      <input type="file" id="sidebarFileInput" accept=".xlsx,.xls,.csv,.pdf" multiple>
+      <div class="up-icon">+</div>
+      <div class="up-label">Завантажити файл</div>
+      <div class="up-formats">XLSX · CSV · PDF</div>
+    </div>
+
+    <div class="sidebar-section-label">Загалом по акаунту</div>
+    <div id="userStatsPanel" class="sidebar-stats">
+      <div class="sidebar-stats-empty">—</div>
+    </div>
+
+    <div class="sidebar-section-label">Завантаження</div>
+    <div class="uploads-list" id="uploadsList">
+      <div class="sidebar-empty" id="uploadsEmpty">Поки немає завантажень.<br>Додайте перший файл.</div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <header>
+      <div class="header-left">
+        <div class="header-status">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">завантаження...</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <a class="btn-icon" href="/admin" id="adminLink" style="display:none;text-decoration:none">Адмін</a>
+        <button type="button" class="btn-icon" id="apiKeyBtn">🔑 API ключ</button>
+        <div class="user-chip">
+          <span id="usernameDisplay">—</span>
+          <span class="role-badge" id="roleBadge">user</span>
+        </div>
+        <button type="button" class="btn-icon danger" id="logoutBtn">Вийти</button>
+      </div>
+    </header>
+
+    <section id="empty-section">
+      <div class="empty-hero">
+        <h1>Аналіз<br>ваших <span class="grad">витрат</span></h1>
+        <p>Завантажте банківську виписку — GPT-4o проаналізує транзакції, знайде підписки та надасть рекомендації.</p>
+      </div>
+
+      <div class="drop-zone-big" id="dropZoneBig">
+        <input type="file" id="mainFileInput" accept=".xlsx,.xls,.csv,.pdf" multiple>
+        <div class="dz-icon">📊</div>
+        <h3>Перетягніть файли сюди</h3>
+        <p>або натисніть щоб вибрати · декілька файлів одночасно</p>
+        <div class="fmt-chips">
+          <span class="fmt-chip">XLSX</span>
+          <span class="fmt-chip">CSV</span>
+          <span class="fmt-chip">PDF</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard-section">
+      <div class="dash-topbar">
+        <div class="dash-title">
+          <span id="periodLabel">—</span>
+          <span id="dashTitle">Аналіз витрат</span>
+        </div>
+      </div>
+
+      <div class="metrics-grid" id="metricsGrid"></div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">Витрати за місяцями</div>
+          <div class="chart-sub">динаміка загальних витрат</div>
+          <div class="chart-wrap" style="height:210px"><canvas id="chartMonthly"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">По категоріях</div>
+          <div class="chart-sub">розподіл витрат</div>
+          <div class="chart-wrap" style="height:210px"><canvas id="chartCats"></canvas></div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">Топ-10 категорій</div>
+          <div class="chart-sub">сума в UAH</div>
+          <div class="chart-wrap" id="barChartWrap"><canvas id="chartBar"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Щоденні витрати</div>
+          <div class="chart-sub">середнє по днях тижня</div>
+          <div class="chart-wrap" style="height:210px"><canvas id="chartWeekday"></canvas></div>
+        </div>
+      </div>
+
+      <div class="ai-card">
+        <div class="ai-header">
+          <div class="ai-badge">GPT-4o</div>
+          <div class="ai-title">AI-аналіз витрат</div>
+        </div>
+        <div class="ai-content" id="aiAnalysis">—</div>
+      </div>
+
+      <div class="ai-card" id="recsCard" style="display:none">
+        <div class="ai-header">
+          <div class="ai-badge">рекомендації</div>
+          <div class="ai-title">Що можна оптимізувати</div>
+        </div>
+        <div class="recommendations-grid" id="recsGrid"></div>
+      </div>
+
+      <div class="ai-card" id="subsCard" style="display:none">
+        <div class="ai-header">
+          <div class="ai-badge">підписки</div>
+          <div class="ai-title">Виявлені регулярні платежі</div>
+        </div>
+        <div class="recommendations-grid" id="subsGrid"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="chart-title">Всі транзакції</div>
+        <div class="chart-sub" id="txSubtitle"></div>
+        <div class="tx-controls">
+          <input class="tx-search" type="search" id="txSearch" placeholder="Пошук за описом...">
+          <select class="tx-select" id="catFilter">
+            <option value="">Всі категорії</option>
+          </select>
+          <select class="tx-select" id="typeFilter">
+            <option value="">Всі</option>
+            <option value="expense">Витрати</option>
+            <option value="income">Надходження</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Опис</th>
+                <th>Категорія</th>
+                <th style="text-align:right">Сума (UAH)</th>
+                <th style="text-align:right">Валюта</th>
+              </tr>
+            </thead>
+            <tbody id="txBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="/static/js/dashboard.js"></script>
+</body>
+</html>
